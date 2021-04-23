@@ -5,11 +5,12 @@ output:
     keep_md: true
 ---
 Author: Antonio Vitor Villas Boas  
-last update: `r Sys.time()`  
+last update: 2021-04-23 12:15:23  
 
 ## Loading and preprocessing the data
 
-```{r, warning=FALSE, message=FALSE, cache=TRUE}
+
+```r
 library(dplyr)
 
 if (!("rawData" %in% ls())){
@@ -27,7 +28,8 @@ activity <- rawData %>%
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 steps_sum <- with(activity, aggregate(steps, 
                                       by = list(date),
                                       FUN = sum,
@@ -41,20 +43,33 @@ hist(steps_sum$x,
 rug(steps_sum$x)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 Mean of total number of steps taken per day:
 
-```{r}
+
+```r
 round(mean(steps_sum$x), 2)
+```
+
+```
+## [1] 9354.23
 ```
 
 Median of total number of steps taken per day:
 
-```{r}
+
+```r
 median(steps_sum$x)
 ```
 
+```
+## [1] 10395
+```
+
 ## What is the average daily activity pattern?
-```{r, cache=TRUE}
+
+```r
 library(ggplot2)
 
 avg_daily <- with(activity, aggregate(steps, 
@@ -86,16 +101,26 @@ ggplot(data = avg_daily,
                )
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
 ## Imputing missing values
 
-```{r}
+
+```r
 table(is.na(activity$steps))
+```
+
+```
+## 
+## FALSE  TRUE 
+## 15264  2304
 ```
 There are 2304 rows with NAs
 
 The strategy chosen for filling the missing values in the dataset was to use the mean for that 5-minute interval
 
-```{r}
+
+```r
 activity_filled <- activity
 for (i in 1:dim(activity)[1]){
         if (is.na(activity$steps[i])){
@@ -106,11 +131,18 @@ for (i in 1:dim(activity)[1]){
 table(is.na(activity_filled$steps))
 ```
 
+```
+## 
+## FALSE 
+## 17568
+```
+
 There is no more NAs in the new dataset  
 
 Now let's see the new histogram:
 
-```{r}
+
+```r
 steps_sum_imputed <- with(activity_filled, 
                           aggregate(steps,
                                     by = list(date),
@@ -124,11 +156,14 @@ hist(steps_sum_imputed$x,
 rug(steps_sum_imputed$x)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
 1st we add a new column to distinguish which day type the activity is performed, wheather is weekday or weekend.
 
-```{r}
+
+```r
 activity$daytype <- sapply(activity$weekday,
                            function(d) {
                                    if ((d == "Sathurday") || (d == "Sunday")){
@@ -147,7 +182,8 @@ activity_by_daytype <- aggregate(steps ~ interval + daytype,
 
 Now we plot 1 graphic for each day type so we can compare:
 
-```{r}
+
+```r
 ggplot(activity_by_daytype,
        aes(x = interval,
            y = steps,
@@ -161,3 +197,5 @@ ggplot(activity_by_daytype,
              y = "Number of steps") +
         theme(legend.position = "none")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
